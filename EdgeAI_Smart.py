@@ -10,7 +10,7 @@ import tensorflow.compat.v1 as tf  # compatibility mode of tf1 in tf2
 
 #physical_devices=tf.config.list_physical_devices('GPU') #tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
-allowedUser = ["Sidi", "Pierre"]
+allowedUser = ["dominique", "olivier_dm", "adam", "philippe", "hughes", "frank"]
 global ok
 
 
