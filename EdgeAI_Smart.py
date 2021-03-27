@@ -48,7 +48,7 @@ def authentification():
     face_recognition = face.Recognition()
     start_time = time.time()
 
-    while (ok < 50):
+    while (ok < 20):
         # Capture frame-by-frame
         ret, frame = video_capture.read()
         frame = cv2.resize(frame, (640,480), interpolation=cv2.INTER_AREA)
