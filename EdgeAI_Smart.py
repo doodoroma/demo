@@ -21,7 +21,7 @@ if not os.path.exists("config.json"):
   configuration['teamsActivated']=False
   configuration['smsConfig']=""
   configuration['teamsConfig']=""
-  configuration['allowedUser']=["dominique", "olivier_dm", "adam", "philippe", "hughes", "frank"]
+  configuration['allowedUser']=["dominique", "olivier dm", "adam", "philippe", "hughes", "frank"]
   with open('config.json', 'w') as outfile:
       json.dump(configuration, outfile)
 else:
@@ -32,21 +32,22 @@ else:
 
 #physical_devices=tf.config.list_physical_devices('GPU') #tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
-allowedUser = ["dominique", "olivier_dm", "adam", "philippe", "hughes", "frank"]
+#allowedUser = ["dominique", "olivier_dm", "adam", "philippe", "hughes", "frank"]
 global ok
 global loggedInUser
 loggedInUser={}
-for user in allowedUser:
+for user in configuration['allowedUser']:
   loggedInUser[user]=0
 
-loggedInUser['olivier_dm']=10
+#loggedInUser['olivier_dm']=10
 
 def add_overlays(frame, faces, frame_rate, ok):
     names=[]
     if faces is not None:
         for face in faces:
             if face.name is not None:
-                if face.name in allowedUser:                                            # Green
+                print(face.name)
+                if face.name in configuration['allowedUser']:                                            # Green
                     loggedInUser[face.name]+=1
                     ok += 1
                     if (ok==20):
@@ -144,7 +145,7 @@ def main():
         except RuntimeError as e:
             print(e)
     
-    #######ok=authentification()
+    ok=authentification()
     print ("ok:", ok)
     
     # create interface
@@ -178,7 +179,7 @@ def main():
 
     model_label = Label(top_frame, text="Welcome to your smart home \n {}!".format(max(loggedInUser, key=loggedInUser.get)), font=('Helvetica 24 bold'))
     
-    image_id = Image.open("ID/{}.jpg".format(max(loggedInUser, key=loggedInUser.get)))
+    image_id = Image.open("ID/{}.jpg".format(max(loggedInUser, key=loggedInUser.get).replace(" ","_")))
     image_id = image_id.resize((int(image_id.size[0]*(logoHeight)/image_id.size[1]), logoHeight), Image.ANTIALIAS)
     photo_id = ImageTk.PhotoImage(image_id)
     img_label_id = Label(top_frame,image=photo_id)
