@@ -1,5 +1,7 @@
 import argparse
 import time
+import os
+import json
 from pathlib import Path
 
 import cv2
@@ -14,8 +16,27 @@ from utils.general import check_img_size, check_requirements, check_imshow, non_
 from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 
+import NotificationHandler
+
+def setup_notification():
+    if not os.path.exists("../../config.json"):
+        return NotificationHandler.NotificationHandler(), ['fire']
+    else:
+        with open('../../config.json') as json_file:
+            configuration = json.load(json_file)
+            return NotificationHandler.NotificationHandler(
+                teams_url=configuration['teamsConfig']['url'],
+                to_numbers=configuration['smsConfig']['to_numbers'],
+                activation={
+                    'Teams': configuration['teamsActivated'],
+                    'SMS': configuration['smsActivated']
+                }
+            ), configuration['notificationClasses']
 
 def detect(save_img=False):
+
+    notification_handler, notify_class_names = setup_notification()
+
     source, weights, view_img, save_txt, imgsz = opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
         ('rtsp://', 'rtmp://', 'http://'))
@@ -60,6 +81,8 @@ def detect(save_img=False):
     if device.type != 'cpu':
         model(torch.zeros(1, 3, imgsz, imgsz).to(device).type_as(next(model.parameters())))  # run once
     t0 = time.time()
+
+    notification_verify = { c: 0 for c in notify_class_names }
     for path, img, im0s, vid_cap in dataset:
         img = torch.from_numpy(img).to(device)
         img = img.half() if half else img.float()  # uint8 to fp16/32
@@ -95,6 +118,25 @@ def detect(save_img=False):
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
 
+                # Send notification to selected classes
+                detected_class_names = [names[int(c)] for c in det[:, -1].unique()]
+                notification_limit = 10
+                for c in notify_class_names:
+                    could_be_sent = notification_verify[c] < notification_limit
+                    if c in detected_class_names and could_be_sent:
+                        notification_verify[c] += 3
+                    elif not could_be_sent:
+                        notification_verify[c] = 0
+                    else:
+                        notification_verify[c] -= 1
+
+                    could_be_sent &= notification_verify[c] >= 10
+                    
+                    if could_be_sent:
+                        notification_handler.notify(
+                            f"Detected elements in the house: {c}"
+                        )
+                        
                 # Print results
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()  # detections per class
