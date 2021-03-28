@@ -28,7 +28,7 @@ if not os.path.exists("config.json"):
   }
   configuration['allowedUser']=["dominique", "olivier dm", "adam", "philippe", "hughes", "frank"]
   with open('config.json', 'w') as outfile:
-      json.dump(configuration, outfile)
+      json.dump(configuration, outfile, indent=4)
 else:
   with open('config.json') as json_file:
       configuration = json.load(json_file)
