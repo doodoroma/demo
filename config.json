@@ -1,52 +1,38 @@
 {
-    "classNames": [
-        "chapeau",
-        "echarpe",
-        "gants",
-        "cle",
-        "lunettes",
-        "parapluie",
-        "telephone",
-        "telecommande",
-        "portefeuille",
-        "fire",
-        "smoke"
-    ],
-    "notificationClasses": [
-        "fire",
-        "smoke"
-    ],
-    "yolo": {
-        "confidence_level": 0.5,
-        "activated_classes": [
-            1,
-            3,
-            4,
-            6,
-            7,
-            8,
-            9,
-            10
-        ]
-    },
-    "smsActivated": 0,
-    "teamsActivated": 1,
-    "smsConfig": {
-        "to_numbers": [
-            "+32465294650"
-        ],
-        "SMS_SID": "ACe399538ba69578fa49aec9e458e85863",
-        "SMS_TOKEN": "a068cff3aaa9a88ba98ad480b82f7831"
-    },
-    "teamsConfig": {
-        "url": "https://alumniumonsac.webhook.office.com/webhookb2/079e6963-be2e-4a27-a841-2ca66992b92d@488bed9d-d6a7-48d5-ba1f-ebec3823b357/IncomingWebhook/5636c849f828489cb959dd90a84134a9/73aee495-f3db-45bc-877d-61d3ea62d7e4"
-    },
-    "allowedUser": [
-        "dominique",
-        "olivier dm",
-        "adam",
-        "philippe",
-        "hughes",
-        "frank"
-    ]
+  "classNames": [
+    "chapeau",
+    "echarpe",
+    "gants",
+    "cle",
+    "lunettes",
+    "parapluie",
+    "telephone",
+    "telecommande",
+    "portefeuille",
+    "fire",
+    "smoke"
+  ],
+  "notificationClasses": ["fire", "smoke"],
+  "yolo": {
+    "confidence_level": 0.5,
+    "activated_classes": [1, 3, 4, 6, 7, 8, 9, 10]
+  },
+  "smsActivated": 0,
+  "teamsActivated": 1,
+  "smsConfig": {
+    "to_numbers": ["+32465294650"],
+    "SMS_SID": "todo",
+    "SMS_TOKEN": "todo"
+  },
+  "teamsConfig": {
+    "url": "https://alumniumonsac.webhook.office.com/webhookb2/079e6963-be2e-4a27-a841-2ca66992b92d@488bed9d-d6a7-48d5-ba1f-ebec3823b357/IncomingWebhook/5636c849f828489cb959dd90a84134a9/73aee495-f3db-45bc-877d-61d3ea62d7e4"
+  },
+  "allowedUser": [
+    "dominique",
+    "olivier dm",
+    "adam",
+    "philippe",
+    "hughes",
+    "frank"
+  ]
 }
