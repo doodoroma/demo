@@ -1,1 +1,23 @@
-{"classNames": ["chapeau", "echarpe", "gants", "cle", "lunettes", "parapluie", "telephone", "telecommande", "portefeuille", "fire", "smoke"], "yolo": {"confidence_level": 0.5, "activated_classes": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}, "smsActivated": false, "teamsActivated": false, "smsConfig": "", "teamsConfig": "", "allowedUser": ["dominique", "olivier dm", "adam", "philippe", "hughes", "frank"]}
+{
+  "notificationClasses": ["chapeau", "fire", "smoke"],
+  "yolo": {
+    "confidence_level": 0.5,
+    "activated_classes": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  },
+  "smsActivated": true,
+  "teamsActivated": true,
+  "smsConfig": {
+    "to_numbers": ["+32465294650"]
+  },
+  "teamsConfig": {
+    "url": "https://alumniumonsac.webhook.office.com/webhookb2/079e6963-be2e-4a27-a841-2ca66992b92d@488bed9d-d6a7-48d5-ba1f-ebec3823b357/IncomingWebhook/8795fabf715543919aef9f3c9252b95a/73aee495-f3db-45bc-877d-61d3ea62d7e4"
+  },
+  "allowedUser": [
+    "dominique",
+    "olivier dm",
+    "adam",
+    "philippe",
+    "hughes",
+    "frank"
+  ]
+}
