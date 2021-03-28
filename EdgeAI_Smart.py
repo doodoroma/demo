@@ -16,11 +16,16 @@ global configuration
 if not os.path.exists("config.json"):
   configuration={}
   configuration['classNames']=['chapeau', 'echarpe', 'gants', 'cle', 'lunettes', 'parapluie', 'telephone', 'telecommande', 'portefeuille', 'fire', 'smoke']
+  configuration['notificationClases']=['telephone', 'fire', 'smoke']
   configuration['yolo']={'confidence_level':.5,'activated_classes':[0,1,2,3,4,5,6,7,8,9,10]}
   configuration['smsActivated']=False
   configuration['teamsActivated']=False
-  configuration['smsConfig']=""
-  configuration['teamsConfig']=""
+  configuration['smsConfig']={
+      'to_numbers': []
+  }
+  configuration['teamsConfig']={
+      'url': ''
+  }
   configuration['allowedUser']=["dominique", "olivier dm", "adam", "philippe", "hughes", "frank"]
   with open('config.json', 'w') as outfile:
       json.dump(configuration, outfile)

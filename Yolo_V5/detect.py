@@ -1,11 +1,14 @@
+from Yolo_V5.NotificationHandler import NotificationHandler
+import os
 import argparse
 import time
+import json
 from pathlib import Path
 
 import cv2
 import torch
 import torch.backends.cudnn as cudnn
-from numpy import random
+from numpy import intersect1d, random
 
 from models.experimental import attempt_load
 from utils.datasets import LoadStreams, LoadImages
@@ -14,8 +17,28 @@ from utils.general import check_img_size, check_requirements, check_imshow, non_
 from utils.plots import plot_one_box
 from utils.torch_utils import select_device, load_classifier, time_synchronized
 
+from . import NotificationHandler
+
+def setup_notification():
+    if not os.path.exists("config.json"):
+        return NotificationHandler.NotificationHandler(), ['fire']
+    else:
+        with open('config.json') as json_file:
+            configuration = json.load(json_file)
+            return NotificationHandler.NotificationHandler(
+                teams_url=configuration['teamsConfig']['url'],
+                to_numbers=configuration['smsConfig']['to_numbers'],
+                activation={
+                    'Teams': configuration['teamsActivated'],
+                    'SMS': configuration['smsActivated']
+                }
+            ), configuration['notificationClases']
+
 
 def detect(save_img=False):
+    
+    notification_handler, notify_class_names = setup_notification()    
+
     source, weights, view_img, save_txt, imgsz = opt.source, opt.weights, opt.view_img, opt.save_txt, opt.img_size
     webcam = source.isnumeric() or source.endswith('.txt') or source.lower().startswith(
         ('rtsp://', 'rtmp://', 'http://'))
@@ -94,6 +117,14 @@ def detect(save_img=False):
             if len(det):
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], im0.shape).round()
+
+                detected_class_names = [names[int(c)] for c in det[:, -1].unique()]
+                classes_to_send_notification_for = list(set(detected_class_names) & set(notify_class_names))
+
+                if len(classes_to_send_notification_for) > 0:
+                    notification_handler.notify(
+                        f"Detected elements in the house: {', '.join(classes_to_send_notification_for)}"
+                    )
 
                 # Print results
                 for c in det[:, -1].unique():

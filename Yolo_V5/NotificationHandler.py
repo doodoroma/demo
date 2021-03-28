@@ -8,7 +8,7 @@ class NotificationHandler:
         self,
         teams_url,
         to_numbers = None,
-        config: dict = None
+        activation: dict = None,
     ) -> None:
         self.teams_url = teams_url
         self.myTeamsMessage = pymsteams.connectorcard(self.teams_url)
@@ -18,7 +18,7 @@ class NotificationHandler:
         self.client = Client(account_sid, auth_token)
         self.to_numbers = to_numbers or []
 
-        self.config = config or {}
+        self.activation = activation or {}
 
     def _notify_teams(self, msg: str) -> None:
         self.myTeamsMessage.text(msg)
@@ -37,9 +37,9 @@ class NotificationHandler:
             )
 
     def notify(self, msg) -> None:
-        if self.config.get('Teams', False):
+        if self.activation.get('Teams', False):
             self._notify_teams(msg)
-        if self.config.get('SMS', False):
+        if self.activation.get('SMS', False):
             self._notify_sms(msg)
 
 
