@@ -7,14 +7,16 @@ class NotificationHandler:
     def __init__(
         self,
         teams_url,
+        SMS_SID = None,
+        SMS_TOKEN = None,
         to_numbers = None,
         activation: dict = None,
     ) -> None:
         self.teams_url = teams_url
         self.myTeamsMessage = pymsteams.connectorcard(self.teams_url)
 
-        account_sid = os.getenv("SMS_SID")
-        auth_token = os.getenv("SMS_TOKEN")
+        account_sid = SMS_SID
+        auth_token = SMS_TOKEN
         self.client = Client(account_sid, auth_token)
         self.to_numbers = to_numbers or []
 

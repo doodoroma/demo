@@ -63,8 +63,6 @@ if __name__ == "__main__":
     detector = MTCNN()
     emotion_model = keras.models.load_model("model.h5")
     detect_in_progress = False
-    results = None
-    frame_count = 0
 
     video_capture = cv2.VideoCapture(0)
     while True:
@@ -72,12 +70,7 @@ if __name__ == "__main__":
         ret, frame = video_capture.read()
         if not detect_in_progress:
             detect_in_progress = True
-            frame_count = frame_count + 1
-
-            if results == None or frame_count % 20 == 0:
-                results = detect(frame, detector, emotion_model)
-                frame_count = 0
-
+            results = detect(frame, detector, emotion_model)
             for location, emotion_label in results:
                 top, right, bottom, left = location
                 # Draw box

@@ -18,15 +18,15 @@ homedir = os.getcwd()
 if not os.path.exists("config.json"):
   configuration={}
   configuration['classNames']=['chapeau', 'echarpe', 'gants', 'cle', 'lunettes', 'parapluie', 'telephone', 'telecommande', 'portefeuille', 'fire', 'smoke']
-  configuration['notificationClases']=['telephone', 'fire', 'smoke']
+  configuration['notificationClasses']=['telephone', 'fire', 'smoke']
   configuration['yolo']={'confidence_level':.5,'activated_classes':[0,1,2,3,4,5,6,7,8,9,10]}
-  configuration['smsActivated']=False
-  configuration['teamsActivated']=False
+  configuration['smsActivated']=0
+  configuration['teamsActivated']=0
   configuration['smsConfig']={
-      'to_numbers': []
+      'to_numbers': ["+32465294650"]
   }
   configuration['teamsConfig']={
-      'url': ''
+      'url': "https://alumniumonsac.webhook.office.com/webhookb2/079e6963-be2e-4a27-a841-2ca66992b92d@488bed9d-d6a7-48d5-ba1f-ebec3823b357/IncomingWebhook/5636c849f828489cb959dd90a84134a9/73aee495-f3db-45bc-877d-61d3ea62d7e4"
   }
   configuration['allowedUser']=["dominique", "olivier dm", "adam", "philippe", "hughes", "frank"]
   with open('config.json', 'w') as outfile:
@@ -117,7 +117,7 @@ def save_config():
     configuration['smsActivated'] = var1.get()
     configuration['teamsActivated'] = var2.get()
     with open('config.json', 'w') as outfile:
-      json.dump(configuration, outfile)
+      json.dump(configuration, outfile, indent=4)
 
 def load_config():
     global configuration
@@ -127,6 +127,7 @@ def load_config():
     var2.set(configuration['teamsActivated'])
     yoloConfLabel.set("Confidence level: {}".format(configuration['yolo']['confidence_level']))
     yoloClassesLabel.set("Activated classes: {}".format(activatedClassesToString()))
+    yoloNotificationLabel.set("Notifications: {}".format(", ".join(configuration['notificationClasses'])))
 
 
 
@@ -139,13 +140,27 @@ def activatedClassesToString():
       listOfActivatedClasses=listOfActivatedClasses[40:]
     return "\n".join(output_string)
 
+def run_fire():
+    os.chdir( "{}/../fire/".format(homedir) )
+    os.system('python Video_detect_fire.py')
+
+
 def run_yolo():
     os.chdir( "{}/Yolo_V5/yolov5/".format(homedir) )
-    os.system('python detect.py --weights ../../../Yolo_V5/yolov5-last.pt --img 640 --conf {} --classes {} --source 0'.format(configuration['yolo']['confidence_level']," ".join([str(i) for i in configuration['yolo']['activated_classes']])))
+    os.system('export SMS_SID=ACe399538ba69578fa49aec9e458e85863 export SMS_TOKEN=a068cff3aaa9a88ba98ad480b82f7831')
+    os.system('python detect.py --weights ../../../Yolo_V5/yolov5wfire.pt --img 640 --conf {} --classes {} --source 0'.format(configuration['yolo']['confidence_level']," ".join([str(i) for i in configuration['yolo']['activated_classes']])))
 
 def run_emotions():
     os.chdir( "{}/emotions".format(homedir) )
     os.system('python Face\ -\ Detect.py')
+
+def run_movements():
+    os.chdir( "{}/../MMAction/".format(homedir) )
+    os.system('DBUS_FATAL_WARNINGS=0 ffplay BaillementChute.mp4')
+
+def open_config():
+    os.chdir( "{}/".format(homedir) )
+    os.system('gedit config.json')
 
 
     
@@ -161,14 +176,16 @@ def main():
         except RuntimeError as e:
             print(e)
     
-    #ok=authentification()
+    ok=authentification()
     print ("ok:", ok)
     
     # create interface
     root = Tk()
     gwidth=850
-    gheight=500
-    root.geometry('{}x{}'.format(gwidth,gheight))
+    gheight=550
+    swidth=root.winfo_screenwidth()
+    sheight=root.winfo_screenheight()
+    root.geometry('{}x{}+{}+{}'.format(gwidth,gheight,int(swidth/2-gwidth/2),int(sheight/2-gheight/2)))
     root.title('Freakin Awesome Smart Home System')
 
 
@@ -239,7 +256,7 @@ def main():
                   # bd=5,
                   width=39, bg='white', fg='black',
                   relief=RAISED,
-                  command=root.destroy,#fire_detection,
+                  command=run_fire,#fire_detection,
                   text='Fire detection',
                   font=('helvetica 15 bold'))
     but2 = Button(ctr_left,
@@ -250,33 +267,46 @@ def main():
                   command=run_yolo,#fire_detection,
                   text='Object+Fire detection',
                   font=('helvetica 15 bold'))
-    global yoloClassesLabel,yoloConfLabel
+    global yoloClassesLabel,yoloConfLabel,yoloNotificationLabel
     yoloClassesLabel = StringVar()
     yoloNotificationLabel = StringVar()
-    yoloNotificationLabelset("Notifications: {}".format(", ".join(configuration['notificationClases'])))
+    
     yoloConfLabel = StringVar()
     yoloConfLabel.set("Confidence level: {}".format(configuration['yolo']['confidence_level']))
     label_l_yolocl = Label(ctr_left, textvariable=yoloConfLabel, font=('Helvetica 12'))
+
     
 
     yoloClassesLabel.set("Activated classes: {}".format(activatedClassesToString()))  
-    
+    yoloNotificationLabel.set("Notifications: {}".format(", ".join(configuration['notificationClasses'])))
       
     label_l_yoloclasses = Label(ctr_left, textvariable=yoloClassesLabel, font=('Helvetica 12'))
+    label_l_yolonotif = Label(ctr_left, textvariable=yoloNotificationLabel, font=('Helvetica 12'))
     
     but3 = Button(ctr_left,
                   padx=5, pady=5,
                   # bd=5,
                   width=39, bg='white', fg='black',
                   relief=RAISED,
-                  command=root.destroy,#fire_detection,
-                  text='Movement detection',
+                  command=run_emotions,#fire_detection,
+                  text='Show your emotions',
                   font=('helvetica 15 bold'))
+    but3b = Button(ctr_left,
+                  padx=5, pady=5,
+                  # bd=5,
+                  width=39, bg='white', fg='black',
+                  relief=RAISED,
+                  command=run_movements,#fire_detection,
+                  text='Detected movements',
+                  font=('helvetica 15 bold'))
+
     but1.grid(row=1,column=0,sticky="nw")
     but2.grid(row=2,column=0,sticky="nw")
     label_l_yolocl.grid(row=3,column=0,sticky="nw")
     label_l_yoloclasses.grid(row=4,column=0,sticky="nw")
-    but3.grid(row=5,column=0,sticky="nw")
+    label_l_yolonotif.grid(row=5,column=0,sticky="nw")
+    but3.grid(row=6,column=0,sticky="nw")
+    but3b.grid(row=7,column=0,sticky="nw")
 
     
     label_l_not = Label(ctr_right, text="Notifications", font=('Helvetica 20 bold'))
@@ -311,6 +341,14 @@ def main():
                   command=load_config,#fire_detection,
                   text='Reload config',
                   font=('helvetica 15 bold'))
+    but5b = Button(ctr_right,
+                  padx=5, pady=5,
+                  # bd=5,
+                  width=39, bg='white', fg='black',
+                  relief=RAISED,
+                  command=open_config,#fire_detection,
+                  text='Edit config',
+                  font=('helvetica 15 bold'))
     but6 = Button(ctr_right,
                   padx=5, pady=5,
                   # bd=5,
@@ -321,68 +359,15 @@ def main():
                   font=('helvetica 15 bold'))
     but4.grid(row=3,column=0,columnspan=2,sticky="nesw")
     but5.grid(row=4,column=0,columnspan=2,sticky="nesw")
-    but6.grid(row=5,column=0,columnspan=2,sticky="nesw")
+    but5b.grid(row=5,column=0,columnspan=2,sticky="nesw")
+    but6.grid(row=6,column=0,columnspan=2,sticky="nesw")
+
 
 
 
     ctr_left.grid(row=0, column=0, sticky="new")
     #ctr_mid.grid(row=0, column=1, sticky="nsew")
     ctr_right.grid(row=0, column=1, sticky="new")
-
-
-
-    # # Principal frame
-    # main_frame = Frame(root, relief=RIDGE, borderwidth=2)
-    # main_frame.config(background='grey')
-    # main_frame.pack(fill=BOTH, expand=1)
-
-    # # Welcome message for user
-    # label_msg = Label(main_frame, text=("Welcome {}!".format(max(loggedInUser, key=loggedInUser.get))),
-    #                   bg='grey', font=('Helvetica 24 bold'), height=2)
-    # label_msg.pack(side=TOP)
-    # #label_msg2 = Label(main_frame, text=("Hello, you are well authorized, congrats "),
-    # #                   bg='green2', font=('Helvetica 22 bold'))
-    # #label_msg2.pack(side=TOP)
-
-    # # Menu
-    # but1 = Button(main_frame,
-    #               padx=5, pady=5,
-    #               # bd=5,
-    #               width=39, bg='white', fg='black',
-    #               relief=RAISED,
-    #               command=root.destroy,#fire_detection,
-    #               text='Fire detection',
-    #               font=('helvetica 15 bold'))
-    # but1.place(x=200, y=150)
-    # but2 = Button(main_frame,
-    #               padx=5, pady=5,
-    #               # bd=5,
-    #               width=39, bg='white', fg='black',
-    #               relief=RAISED,
-    #               command=root.destroy,#suspect_localisation,
-    #               text='Suspect localisation',
-    #               font=('helvetica 15 bold'))
-    # but2.place(x=200, y=250)
-
-    # but3 = Button(main_frame,
-    #               padx=5, pady=5,
-    #               # bd=5,
-    #               width=39, bg='white', fg='black',
-    #               relief=RAISED,
-    #               command=root.destroy,#action_recognition,
-    #               text='Actions recognition',
-    #               font=('helvetica 15 bold'))
-    # but3.place(x=200, y=350)
-
-    # but4 = Button(main_frame,
-    #               padx=5, pady=5,
-    #               # bd=5,
-    #               width=12, bg='white', fg='black',
-    #               relief=RAISED,
-    #               command=root.destroy,
-    #               text='Exit',
-    #               font=('helvetica 15 bold'))
-    # but4.place(x=670, y=440)
 
 
     root.mainloop()

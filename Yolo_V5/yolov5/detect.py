@@ -27,6 +27,8 @@ def setup_notification():
             return NotificationHandler.NotificationHandler(
                 teams_url=configuration['teamsConfig']['url'],
                 to_numbers=configuration['smsConfig']['to_numbers'],
+                SMS_SID=configuration['smsConfig']['SMS_SID'],
+                SMS_TOKEN=configuration['smsConfig']['SMS_TOKEN'],
                 activation={
                     'Teams': configuration['teamsActivated'],
                     'SMS': configuration['smsActivated']
