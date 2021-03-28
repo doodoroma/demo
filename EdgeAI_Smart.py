@@ -132,6 +132,10 @@ def activatedClassesToString():
       listOfActivatedClasses=listOfActivatedClasses[40:]
     return "\n".join(output_string)
 
+def run_yolo():
+    os.chdir( "Yolo_V5/yolov5/" )
+    os.system('python detect.py --weights ../../../Yolo_V5/yolov5-last.pt --img 640 --conf {} --source 0'.format(configuration['yolo']['confidence_level']))
+
     
 def main():
     tf.disable_v2_behavior()  # compatibility mode of tf1 in tf2
@@ -145,7 +149,7 @@ def main():
         except RuntimeError as e:
             print(e)
     
-    ok=authentification()
+    #ok=authentification()
     print ("ok:", ok)
     
     # create interface
@@ -231,7 +235,7 @@ def main():
                   # bd=5,
                   width=39, bg='white', fg='black',
                   relief=RAISED,
-                  command=root.destroy,#fire_detection,
+                  command=run_yolo,#fire_detection,
                   text='Object+Fire detection',
                   font=('helvetica 15 bold'))
     global yoloClassesLabel,yoloConfLabel
