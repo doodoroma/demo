@@ -12,6 +12,8 @@ import json
 import os
 
 global configuration
+global homedir
+homedir = os.getcwd()
 
 if not os.path.exists("config.json"):
   configuration={}
@@ -33,7 +35,7 @@ else:
   with open('config.json') as json_file:
       configuration = json.load(json_file)
 
-#" ".join([str(i) for i in classes])
+#" ".join([str(i) for i in configuration['yolo']['activated_classes']])
 
 #physical_devices=tf.config.list_physical_devices('GPU') #tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
@@ -138,8 +140,13 @@ def activatedClassesToString():
     return "\n".join(output_string)
 
 def run_yolo():
-    os.chdir( "Yolo_V5/yolov5/" )
-    os.system('python detect.py --weights ../../../Yolo_V5/yolov5-last.pt --img 640 --conf {} --source 0'.format(configuration['yolo']['confidence_level']))
+    os.chdir( "{}/Yolo_V5/yolov5/".format(homedir) )
+    os.system('python detect.py --weights ../../../Yolo_V5/yolov5-last.pt --img 640 --conf {} --classes {} --source 0'.format(configuration['yolo']['confidence_level']," ".join([str(i) for i in configuration['yolo']['activated_classes']])))
+
+def run_emotions():
+    os.chdir( "{}/emotions".format(homedir) )
+    os.system('python Face\ -\ Detect.py')
+
 
     
 def main():
@@ -245,6 +252,8 @@ def main():
                   font=('helvetica 15 bold'))
     global yoloClassesLabel,yoloConfLabel
     yoloClassesLabel = StringVar()
+    yoloNotificationLabel = StringVar()
+    yoloNotificationLabelset("Notifications: {}".format(", ".join(configuration['notificationClases'])))
     yoloConfLabel = StringVar()
     yoloConfLabel.set("Confidence level: {}".format(configuration['yolo']['confidence_level']))
     label_l_yolocl = Label(ctr_left, textvariable=yoloConfLabel, font=('Helvetica 12'))
